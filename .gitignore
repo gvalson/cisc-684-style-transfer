@@ -1,0 +1,4 @@
+__pycache__
+*.pth
+*.npy
+out*.png
