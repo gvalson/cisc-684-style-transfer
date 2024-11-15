@@ -10,7 +10,7 @@ from dataset import wikiart
 from itertools import product
 
 if __name__ == '__main__':
-    device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device('cpu')
     model, style_losses = get_vgg19()
     model = model.to(device)
     for style_loss in style_losses:
@@ -23,10 +23,11 @@ if __name__ == '__main__':
 
     artists = ['claude-monet', 'vincent-van-gogh', 'pablo-picasso', 'katsushika-hokusai']
     styles = ['Impressionism', 'Realism', 'Post_Impressionism', 'Expressionism', 'Cubism', 'Ukiyo_e']
-
+    artists = ['vincent-van-gogh']
+    styles = ['Post_Impressionism']
     for artist, style in product(artists, styles):
         print(artist, style)
-        dataset = wikiart(style=style, artist=artist, img_size=512)
+        dataset = wikiart(root='../data/wikiart_lum', style=style, artist=artist, img_size=512)
         if len(dataset.paths) == 0:
             continue
         dataloader = DataLoader(dataset, batch_size=1)
@@ -40,5 +41,4 @@ if __name__ == '__main__':
                 outputs.append(output)
             features.append(torch.cat(outputs, dim=1))
         feature = torch.cat(features, dim=0).numpy()
-        exit()
-        np.save(f'./features/{artist}_{style}.npy', feature)
+        np.save(f'./features_lum/{artist}_{style}_lum.npy', feature)
