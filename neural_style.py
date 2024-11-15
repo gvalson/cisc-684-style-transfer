@@ -12,9 +12,9 @@ from CaffeLoader import loadCaffemodel, ModelParallel
 import argparse
 parser = argparse.ArgumentParser()
 # Basic options
-parser.add_argument("-style_image", help="Style target image", default='examples/seated-nude.jpg')
+parser.add_argument("-style_image", help="Style target image", default='examples/starry_night_lum.jpg')
 parser.add_argument("-style_blend_weights", default=None)
-parser.add_argument("-content_image", help="Content target image", default='examples/tubingen.jpg')
+parser.add_argument("-content_image", help="Content target image", default='examples/tubingen_lum.jpg')
 parser.add_argument("-image_size", help="Maximum height / width of generated image", type=int, default=512)
 parser.add_argument("-gpu", help="Zero-indexed ID of the GPU to use; for CPU mode set -gpu = c", default=0)
 
@@ -39,6 +39,7 @@ parser.add_argument("-output_image", default='outputs/out.png')
 # Other options
 parser.add_argument("-style_scale", type=float, default=1.0)
 parser.add_argument("-original_colors", type=int, choices=[0, 1], default=0)
+parser.add_argument("-org_content_image", default='examples/tubingen.jpg')
 parser.add_argument("-pooling", choices=['avg', 'max'], default='max')
 parser.add_argument("-model_file", type=str, default='models/vgg19-d01eb7cb.pth')
 parser.add_argument("-disable_check", action='store_true')
@@ -52,7 +53,7 @@ parser.add_argument("-style_layers", help="layers for style", default='relu1_1,r
 parser.add_argument("-multidevice_strategy", default='4,7,29')
 
 parser.add_argument('-load_gram', action='store_true')
-parser.add_argument('-gram_file', default='features/pablo-picasso_Cubism.npy')
+parser.add_argument('-gram_file', default='features_lum/katsushika-hokusai_Ukiyo_e_lum.npy')#'features/pablo-picasso_Cubism.npy')
 params = parser.parse_args()
 
 
@@ -241,7 +242,8 @@ def main():
 
             # Maybe perform postprocessing for color-independent style transfer
             if params.original_colors == 1:
-                disp = original_colors(deprocess(content_image.clone()), disp)
+                # disp = original_colors(deprocess(content_image.clone()), disp)
+                disp = original_colors(deprocess(preprocess(params.org_content_image, params.image_size).type(dtype)), disp)
 
             disp.save(str(filename))
 
